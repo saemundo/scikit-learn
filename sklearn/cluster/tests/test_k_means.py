@@ -31,7 +31,7 @@ from sklearn.exceptions import DataConversionWarning
 from sklearn.metrics.cluster import homogeneity_score
 
 import unittest
-from six import assertRaisesRegex
+# from six import assertRaisesRegex
 
 # non centered, sparse centers to check the
 centers = np.array([
