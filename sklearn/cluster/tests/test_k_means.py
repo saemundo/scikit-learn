@@ -1114,10 +1114,14 @@ def gather_tests_and_run_as_one():
         except TypeError:
             p_suite.addTests(fun())
     test_res = unittest.TextTestRunner(verbosity=0).run(p_suite)
+    if failed:
+        tots = failed+test_res.testsRun
+    else:
+        tots = test_res.testsRun
     try:
         failed+=test_res.failures
     except TypeError:
         failed+=len(test_res.failures)
-    test_results = {'name':p_suite.name,'failures':failed,'errors':test_res.errors,'testsRun':test_res.testsRun}
+    test_results = {'name':p_suite.name,'failures':failed,'errors':test_res.errors,'testsRun':tots}
     print test_results
     
