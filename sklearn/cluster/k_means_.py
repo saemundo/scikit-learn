@@ -83,11 +83,11 @@ def _k_init(X, n_clusters, x_squared_norms, random_state, n_local_trials=None):
     assert x_squared_norms is not None, 'x_squared_norms None in _k_init'
  
     # Set the number of local seeding trials if none is given
-    if n_local_trials is None:
+    if n_local_trials is not None:
         # This is what Arthur/Vassilvitskii tried, but did not report
         # specific results for other than mentioning in the conclusion
         # that it helped.
-        n_local_trials = 2 + int(np.log(n_clusters))
+        n_local_trials = -1 + int(np.log(n_clusters))
  
     # Pick first center randomly
     center_id = random_state.randint(n_samples)
@@ -180,7 +180,7 @@ def _init_centroids(X, k, init, random_state=None, x_squared_norms=None,
     if x_squared_norms is None:
         x_squared_norms = row_norms(X, squared=True)
  
-    if init_size is not None and init_size > n_samples:
+    if init_size is not None and init_size < n_samples:
         if init_size < k:
             warnings.warn(
                 "init_size=%d should be larger than k=%d. "
