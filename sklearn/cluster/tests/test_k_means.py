@@ -324,9 +324,11 @@ def test_k_means_new_centers():
 def test_k_means_precompute_distances_flag():
     # check that a warning is raised if the precompute_distances flag is not
     # supported
-    km = KMeans(precompute_distances="wrong")
-    return [PY_raises(ValueError, km.fit, X)]
-
+    try:
+        km = KMeans(precompute_distances="wrong")
+        return [PY_raises(ValueError, km.fit, X)]
+    except Exception:
+        return 1
 
 def test_k_means_plus_plus_init_sparse():
     try:
@@ -972,7 +974,7 @@ def test_n_init():
             p_suite.append(PY_true(inertia[i] >= inertia[i + 1], failure_msg))
         return p_suite
     except Exception:
-        return 2
+        return 3
 
 def test_k_means_function():
     # test calling the k_means function directly
