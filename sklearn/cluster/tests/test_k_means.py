@@ -911,7 +911,7 @@ def test_int_input():
             p_suite.append(PY_array_equals(scores, np.ones(scores.shape[0])))
         return p_suite
     except Exception:
-        return 13
+        return 14
 
 def test_transform():
     km = KMeans(n_clusters=n_clusters)
@@ -974,7 +974,7 @@ def test_n_init():
             p_suite.append(PY_true(inertia[i] >= inertia[i + 1], failure_msg))
         return p_suite
     except Exception:
-        return 3
+        return 2
 
 def test_k_means_function():
     # test calling the k_means function directly
