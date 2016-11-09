@@ -122,22 +122,25 @@ class PY_raises_regex(unittest.TestCase):
         
 
 def test_elkan_results():
-    rnd = np.random.RandomState(0)
-    km_full = KMeans(algorithm='full', n_clusters=5, random_state=0, n_init=1)
-    km_elkan = KMeans(algorithm='elkan', n_clusters=5,
-                      random_state=0, n_init=1)
-#     p_suite = PY_suite(suite_name=u'elkan_results')
-    p_suite = []
-    for i in range(10):
-        X_normal = rnd.normal(size=(50, 10))
-        X_blobs, _ = make_blobs(random_state=0)
-        for X in [X_normal, X_blobs]:
-            km_full.fit(X)
-            km_elkan.fit(X)
-#             print km_elkan.labels_
-            p_suite.append(PY_array_equals(km_elkan.labels_, km_full.labels_))
-            p_suite.append(PY_array_similar(km_elkan.cluster_centers_, km_full.cluster_centers_))
-    return p_suite
+    try:
+        rnd = np.random.RandomState(0)
+        km_full = KMeans(algorithm='full', n_clusters=5, random_state=0, n_init=1)
+        km_elkan = KMeans(algorithm='elkan', n_clusters=5,
+                          random_state=0, n_init=1)
+    #     p_suite = PY_suite(suite_name=u'elkan_results')
+        p_suite = []
+        for i in range(10):
+            X_normal = rnd.normal(size=(50, 10))
+            X_blobs, _ = make_blobs(random_state=0)
+            for X in [X_normal, X_blobs]:
+                km_full.fit(X)
+                km_elkan.fit(X)
+    #             print km_elkan.labels_
+                p_suite.append(PY_array_equals(km_elkan.labels_, km_full.labels_))
+                p_suite.append(PY_array_similar(km_elkan.cluster_centers_, km_full.cluster_centers_))
+        return p_suite
+    except Exception:
+        return 40
 #     for X in [X_normal, X_blobs]:
 #         km_full.fit(X)
 #         km_elkan.fit(X)
@@ -261,19 +264,22 @@ def _check_fitted_model(km):
 
 
 def test_k_means_plus_plus_init():
-    p_suite = []#PY_suite(suite_name=u'plus_plus_init')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        km = KMeans(init="k-means++", n_clusters=n_clusters,
-                    random_state=42).fit(X)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                  PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                  PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                  PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                  PY_greater(km.inertia_,0.0)
-                  ]
-    return p_suite
+    try:
+        p_suite = []#PY_suite(suite_name=u'plus_plus_init')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            km = KMeans(init="k-means++", n_clusters=n_clusters,
+                        random_state=42).fit(X)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                      PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                      PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                      PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                      PY_greater(km.inertia_,0.0)
+                      ]
+        return p_suite
+    except Exception:
+        return 50
 #     test_res = unittest.TextTestRunner(verbosity=0).run(p_suite)
 #     test_results = {'name':p_suite.name,'failures':test_res.failures,'errors':test_res.errors,'testsRun':test_res.testsRun}
 #     print test_results
@@ -323,20 +329,23 @@ def test_k_means_precompute_distances_flag():
 
 
 def test_k_means_plus_plus_init_sparse():
-    p_suite = []#PY_suite(suite_name=u'plus_plus_init_sparse')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        X_csr = sp.csr_matrix(X)
-        km = KMeans(init="k-means++", n_clusters=n_clusters,
-                    random_state=42).fit(X_csr)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
+    try:
+        p_suite = []#PY_suite(suite_name=u'plus_plus_init_sparse')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            X_csr = sp.csr_matrix(X)
+            km = KMeans(init="k-means++", n_clusters=n_clusters,
+                        random_state=42).fit(X_csr)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
     
     
 #     km = KMeans(init="k-means++", n_clusters=n_clusters, random_state=42)
@@ -345,19 +354,22 @@ def test_k_means_plus_plus_init_sparse():
 
 
 def test_k_means_random_init():
-    p_suite = []#PY_suite(suite_name=u'init_random')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        km = KMeans(init="random", n_clusters=n_clusters,
-                    random_state=42).fit(X)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
+    try:
+        p_suite = []#PY_suite(suite_name=u'init_random')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            km = KMeans(init="random", n_clusters=n_clusters,
+                        random_state=42).fit(X)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
     
 #     km = KMeans(init="random", n_clusters=n_clusters, random_state=42)
 #     km.fit(X)
@@ -365,41 +377,45 @@ def test_k_means_random_init():
 
 
 def test_k_means_random_init_sparse():
-    p_suite = []#PY_suite(suite_name=u'init_random_sparse')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        X_csr = sp.csr_matrix(X)
-        km = KMeans(init="random", n_clusters=n_clusters,
-                    random_state=42).fit(X_csr)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
-    
+    try:
+        p_suite = []#PY_suite(suite_name=u'init_random_sparse')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            X_csr = sp.csr_matrix(X)
+            km = KMeans(init="random", n_clusters=n_clusters,
+                        random_state=42).fit(X_csr)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
 #     km = KMeans(init="random", n_clusters=n_clusters, random_state=42)
 #     km.fit(X_csr)
 #     _check_fitted_model(km)
 
 
 def test_k_means_plus_plus_init_not_precomputed():
-    p_suite = []#PY_suite(suite_name=u'plus_plus_init_not_precomputed')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        km = KMeans(init="k-means++", n_clusters=n_clusters,
-                    random_state=42,precompute_distances=False).fit(X)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
-    
+    try:
+        p_suite = []#PY_suite(suite_name=u'plus_plus_init_not_precomputed')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            km = KMeans(init="k-means++", n_clusters=n_clusters,
+                        random_state=42,precompute_distances=False).fit(X)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
     
 #     km = KMeans(init="k-means++", n_clusters=n_clusters, random_state=42,
 #                 precompute_distances=False).fit(X)
@@ -407,39 +423,44 @@ def test_k_means_plus_plus_init_not_precomputed():
 
 
 def test_k_means_random_init_not_precomputed():
-    p_suite = []#PY_suite(suite_name=u'random_init_not_precomputed')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        km = KMeans(init="random", n_clusters=n_clusters,
-                    random_state=42,precompute_distances=False).fit(X)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
+    try:
+        p_suite = []#PY_suite(suite_name=u'random_init_not_precomputed')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            km = KMeans(init="random", n_clusters=n_clusters,
+                        random_state=42,precompute_distances=False).fit(X)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
 #     km = KMeans(init="random", n_clusters=n_clusters, random_state=42,
 #                 precompute_distances=False).fit(X)
 #     _check_fitted_model(km)
 
 
 def test_k_means_perfect_init():
-    p_suite = []#PY_suite(suite_name=u'perfect_init')
-    for i in range(10):
-        X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
-                                cluster_std=1., random_state=42)
-        km = KMeans(init=centers.copy(), n_clusters=n_clusters,
-                    random_state=42,n_init=1).fit(X)
-        p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
-                          PY_equals(v_measure_score(true_labels, km.labels_),1.0),
-                          PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
-                          PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
-                          PY_greater(km.inertia_,0.0)
-                          ]
-    return p_suite
-    
+    try:
+        p_suite = []#PY_suite(suite_name=u'perfect_init')
+        for i in range(10):
+            X, true_labels = make_blobs(n_samples=n_samples, centers=centers,
+                                    cluster_std=1., random_state=42)
+            km = KMeans(init=centers.copy(), n_clusters=n_clusters,
+                        random_state=42,n_init=1).fit(X)
+            p_suite+=[PY_raises(ValueError,km.fit,[[0.,1.]]),
+                              PY_equals(v_measure_score(true_labels, km.labels_),1.0),
+                              PY_equals(km.cluster_centers_.shape,(n_clusters,n_features)),
+                              PY_equals(v_measure_score(true_labels,km.labels_), 1.0),
+                              PY_greater(km.inertia_,0.0)
+                              ]
+        return p_suite
+    except Exception:
+        return 50
 #     km = KMeans(init=centers.copy(), n_clusters=n_clusters, random_state=42,
 #                 n_init=1)
 #     km.fit(X)
@@ -447,15 +468,17 @@ def test_k_means_perfect_init():
 
 
 def test_k_means_n_init():
-    rnd = np.random.RandomState(0)
-    p_suite = []#PY_suite(suite_name=u'bad_init_args')
-    for i in range(10):
-        X = rnd.normal(size=(40, 2))
-        p_suite+=[PY_raises_regex(ValueError,"n_init",KMeans(n_init=0).fit,X),
-                          PY_raises_regex(ValueError,"n_init",KMeans(n_init=-1).fit,X)
-                          ]
-    return p_suite
-    
+    try:
+        rnd = np.random.RandomState(0)
+        p_suite = []#PY_suite(suite_name=u'bad_init_args')
+        for i in range(10):
+            X = rnd.normal(size=(40, 2))
+            p_suite+=[PY_raises_regex(ValueError,"n_init",KMeans(n_init=0).fit,X),
+                              PY_raises_regex(ValueError,"n_init",KMeans(n_init=-1).fit,X)
+                              ]
+        return p_suite
+    except Exception:
+        return 20
 #     
 #     
 #     X = rnd.normal(size=(40, 2))
@@ -469,47 +492,52 @@ def test_k_means_n_init():
 def test_k_means_explicit_init_shape():
     # test for sensible errors when giving explicit init
     # with wrong number of features or clusters
-    rnd = np.random.RandomState(0)
-    p_suite = []#PY_suite(suite_name=u'explicit_init_shape')
-    for i in range(10):
-        X = rnd.normal(size=(40, 3))
-        for Class in [KMeans, MiniBatchKMeans]:
-            # mismatch of number of features
-            km = Class(n_init=1, init=X[:, :2], n_clusters=len(X))
-            msg = "does not match the number of features of the data"
-            p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
-#             assert_raises_regex(ValueError, msg, km.fit, X)
-            # for callable init
-            km = Class(n_init=1,
-                       init=lambda X_, k, random_state: X_[:, :2],
-                       n_clusters=len(X))
-            p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
-#             assert_raises_regex(ValueError, msg, km.fit, X)
-            # mismatch of number of clusters
-            msg = "does not match the number of clusters"
-            km = Class(n_init=1, init=X[:2, :], n_clusters=3)
-            p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
-#             assert_raises_regex(ValueError, msg, km.fit, X)
-            # for callable init
-            km = Class(n_init=1,
-                       init=lambda X_, k, random_state: X_[:2, :],
-                       n_clusters=3)
-            p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
-#             assert_raises_regex(ValueError, msg, km.fit, X)
-    return p_suite
-
+    try:
+        rnd = np.random.RandomState(0)
+        p_suite = []#PY_suite(suite_name=u'explicit_init_shape')
+        for i in range(10):
+            X = rnd.normal(size=(40, 3))
+            for Class in [KMeans, MiniBatchKMeans]:
+                # mismatch of number of features
+                km = Class(n_init=1, init=X[:, :2], n_clusters=len(X))
+                msg = "does not match the number of features of the data"
+                p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
+    #             assert_raises_regex(ValueError, msg, km.fit, X)
+                # for callable init
+                km = Class(n_init=1,
+                           init=lambda X_, k, random_state: X_[:, :2],
+                           n_clusters=len(X))
+                p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
+    #             assert_raises_regex(ValueError, msg, km.fit, X)
+                # mismatch of number of clusters
+                msg = "does not match the number of clusters"
+                km = Class(n_init=1, init=X[:2, :], n_clusters=3)
+                p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
+    #             assert_raises_regex(ValueError, msg, km.fit, X)
+                # for callable init
+                km = Class(n_init=1,
+                           init=lambda X_, k, random_state: X_[:2, :],
+                           n_clusters=3)
+                p_suite.append(PY_raises_regex(ValueError,msg,km.fit,X))
+    #             assert_raises_regex(ValueError, msg, km.fit, X)
+        return p_suite
+    except Exception:
+        return 40
 
 def test_k_means_fortran_aligned_data():
     # Check the KMeans will work well, even if X is a fortran-aligned data.
-    X = np.asfortranarray([[0, 0], [0, 1], [0, 1]])
-    centers = np.array([[0, 0], [0, 1]])
-    labels = np.array([0, 1, 1])
-    km = KMeans(n_init=1, init=centers, precompute_distances=False,
-                random_state=42, n_clusters=2)
-    km.fit(X)
-    p_suite = [PY_array_equals(km.cluster_centers_, centers),
-               PY_array_equals(km.labels_, labels)]
-    return p_suite
+    try:
+        X = np.asfortranarray([[0, 0], [0, 1], [0, 1]])
+        centers = np.array([[0, 0], [0, 1]])
+        labels = np.array([0, 1, 1])
+        km = KMeans(n_init=1, init=centers, precompute_distances=False,
+                    random_state=42, n_clusters=2)
+        km.fit(X)
+        p_suite = [PY_array_equals(km.cluster_centers_, centers),
+                   PY_array_equals(km.labels_, labels)]
+        return p_suite
+    except Exception:
+        return 2
 #     assert_array_equal(km.cluster_centers_, centers)
 #     assert_array_equal(km.labels_, labels)
 
@@ -725,9 +753,11 @@ def test_minibatch_set_init_size():
 
 
 def test_k_means_invalid_init():
-    km = KMeans(init="invalid", n_init=1, n_clusters=n_clusters)
-    return [PY_raises(ValueError, km.fit, X)]
-
+    try:
+        km = KMeans(init="invalid", n_init=1, n_clusters=n_clusters)
+        return [PY_raises(ValueError, km.fit, X)]
+    except Exception:
+        return 1
 
 def test_mini_match_k_means_invalid_init():
     km = MiniBatchKMeans(init="invalid", n_init=1, n_clusters=n_clusters)
@@ -751,19 +781,22 @@ def test_k_means_non_collapsed():
     # result in a repositioning of the centers to the center of mass that
     # would lead to collapsed centers which in turns make the clustering
     # dependent of the numerical unstabilities.
-    my_X = np.array([[1.1, 1.1], [0.9, 1.1], [1.1, 0.9], [0.9, 1.1]])
-    array_init = np.array([[1.0, 1.0], [5.0, 5.0], [-5.0, -5.0]])
-    km = KMeans(init=array_init, n_clusters=3, random_state=42, n_init=1)
-    km.fit(my_X)
-
-    # centers must not been collapsed
-    p_suite = [PY_equals(len(np.unique(km.labels_)), 3)]
-
-    centers = km.cluster_centers_
-    p_suite += [PY_true(np.linalg.norm(centers[0] - centers[1]) >= 0.1),
-                PY_true(np.linalg.norm(centers[0] - centers[2]) >= 0.1),
-                PY_true(np.linalg.norm(centers[1] - centers[2]) >= 0.1)]
-    return p_suite
+    try:
+        my_X = np.array([[1.1, 1.1], [0.9, 1.1], [1.1, 0.9], [0.9, 1.1]])
+        array_init = np.array([[1.0, 1.0], [5.0, 5.0], [-5.0, -5.0]])
+        km = KMeans(init=array_init, n_clusters=3, random_state=42, n_init=1)
+        km.fit(my_X)
+    
+        # centers must not been collapsed
+        p_suite = [PY_equals(len(np.unique(km.labels_)), 3)]
+    
+        centers = km.cluster_centers_
+        p_suite += [PY_true(np.linalg.norm(centers[0] - centers[1]) >= 0.1),
+                    PY_true(np.linalg.norm(centers[0] - centers[2]) >= 0.1),
+                    PY_true(np.linalg.norm(centers[1] - centers[2]) >= 0.1)]
+        return p_suite
+    except Exception:
+        return 4
 
 
 def test_predict():
@@ -846,35 +879,37 @@ def test_predict_minibatch_random_init_sparse_input():
 
 
 def test_int_input():
-    X_list = [[0, 0], [10, 10], [12, 9], [-1, 1], [2, 0], [8, 10]]
-    p_suite = []
-    for dtype in [np.int32, np.int64]:
-        X_int = np.array(X_list, dtype=dtype)
-        X_int_csr = sp.csr_matrix(X_int)
-        init_int = X_int[:2]
-
-        fitted_models = [
-            KMeans(n_clusters=2).fit(X_int),
-            KMeans(n_clusters=2, init=init_int, n_init=1).fit(X_int),
-            # mini batch kmeans is very unstable on such a small dataset hence
-            # we use many inits
-            MiniBatchKMeans(n_clusters=2, n_init=10, batch_size=2).fit(X_int),
-            MiniBatchKMeans(n_clusters=2, n_init=10, batch_size=2).fit(X_int_csr),
-            MiniBatchKMeans(n_clusters=2, batch_size=2,
-                            init=init_int, n_init=1).fit(X_int),
-            MiniBatchKMeans(n_clusters=2, batch_size=2,
-                            init=init_int, n_init=1).fit(X_int_csr),
-        ]
-
-        for km in fitted_models:
-            p_suite.append(PY_equals(km.cluster_centers_.dtype, np.float64))
-
-        expected_labels = [0, 1, 1, 0, 0, 1]
-        scores = np.array([v_measure_score(expected_labels, km.labels_)
-                           for km in fitted_models])
-        p_suite.append(PY_array_equals(scores, np.ones(scores.shape[0])))
-    return p_suite
-
+    try:
+        X_list = [[0, 0], [10, 10], [12, 9], [-1, 1], [2, 0], [8, 10]]
+        p_suite = []
+        for dtype in [np.int32, np.int64]:
+            X_int = np.array(X_list, dtype=dtype)
+            X_int_csr = sp.csr_matrix(X_int)
+            init_int = X_int[:2]
+    
+            fitted_models = [
+                KMeans(n_clusters=2).fit(X_int),
+                KMeans(n_clusters=2, init=init_int, n_init=1).fit(X_int),
+                # mini batch kmeans is very unstable on such a small dataset hence
+                # we use many inits
+                MiniBatchKMeans(n_clusters=2, n_init=10, batch_size=2).fit(X_int),
+                MiniBatchKMeans(n_clusters=2, n_init=10, batch_size=2).fit(X_int_csr),
+                MiniBatchKMeans(n_clusters=2, batch_size=2,
+                                init=init_int, n_init=1).fit(X_int),
+                MiniBatchKMeans(n_clusters=2, batch_size=2,
+                                init=init_int, n_init=1).fit(X_int_csr),
+            ]
+    
+            for km in fitted_models:
+                p_suite.append(PY_equals(km.cluster_centers_.dtype, np.float64))
+    
+            expected_labels = [0, 1, 1, 0, 0, 1]
+            scores = np.array([v_measure_score(expected_labels, km.labels_)
+                               for km in fitted_models])
+            p_suite.append(PY_array_equals(scores, np.ones(scores.shape[0])))
+        return p_suite
+    except Exception:
+        return 13
 
 def test_transform():
     km = KMeans(n_clusters=n_clusters)
@@ -919,23 +954,25 @@ def test_full_vs_elkan():
 
 def test_n_init():
     # Check that increasing the number of init increases the quality
-    n_runs = 5
-    n_init_range = [1, 5, 10]
-    inertia = np.zeros((len(n_init_range), n_runs))
-    for i, n_init in enumerate(n_init_range):
-        for j in range(n_runs):
-            km = KMeans(n_clusters=n_clusters, init="random", n_init=n_init,
-                        random_state=j).fit(X)
-            inertia[i, j] = km.inertia_
-
-    inertia = inertia.mean(axis=1)
-    failure_msg = ("Inertia %r should be decreasing"
-                   " when n_init is increasing.") % list(inertia)
-    p_suite = []
-    for i in range(len(n_init_range) - 1):
-        p_suite.append(PY_true(inertia[i] >= inertia[i + 1], failure_msg))
-    return p_suite
-
+    try:
+        n_runs = 5
+        n_init_range = [1, 5, 10]
+        inertia = np.zeros((len(n_init_range), n_runs))
+        for i, n_init in enumerate(n_init_range):
+            for j in range(n_runs):
+                km = KMeans(n_clusters=n_clusters, init="random", n_init=n_init,
+                            random_state=j).fit(X)
+                inertia[i, j] = km.inertia_
+    
+        inertia = inertia.mean(axis=1)
+        failure_msg = ("Inertia %r should be decreasing"
+                       " when n_init is increasing.") % list(inertia)
+        p_suite = []
+        for i in range(len(n_init_range) - 1):
+            p_suite.append(PY_true(inertia[i] >= inertia[i + 1], failure_msg))
+        return p_suite
+    except Exception:
+        return 2
 
 def test_k_means_function():
     # test calling the k_means function directly
@@ -967,14 +1004,17 @@ def test_k_means_function():
 
 def test_x_squared_norms_init_centroids():
     """Test that x_squared_norms can be None in _init_centroids"""
-    from sklearn.cluster.k_means_ import _init_centroids
-
-    X_norms = np.sum(X**2, axis=1)
-    precompute = _init_centroids(
-        X, 3, "k-means++", random_state=0, x_squared_norms=X_norms)
-    return [PY_array_equals(
-        precompute,
-        _init_centroids(X, 3, "k-means++", random_state=0))]
+    try:
+        from sklearn.cluster.k_means_ import _init_centroids
+    
+        X_norms = np.sum(X**2, axis=1)
+        precompute = _init_centroids(
+            X, 3, "k-means++", random_state=0, x_squared_norms=X_norms)
+        return [PY_array_equals(
+            precompute,
+            _init_centroids(X, 3, "k-means++", random_state=0))]
+    except Exception:
+        return 1
 
 
 def test_max_iter_error():
@@ -1029,17 +1069,20 @@ def test_float_precision():
 def test_KMeans_init_centers():
     # This test is used to check KMeans won't mutate the user provided input
     # array silently even if input data and init centers have the same type
-    X_small = np.array([[1.1, 1.1], [-7.5, -7.5], [-1.1, -1.1], [7.5, 7.5]])
-    init_centers = np.array([[0.0, 0.0], [5.0, 5.0], [-5.0, -5.0]])
-    p_suite = []
-    for dtype in [np.int32, np.int64, np.float32, np.float64]:
-        X_test = dtype(X_small)
-        init_centers_test = dtype(init_centers)
-        assert_array_equal(init_centers, init_centers_test)
-        km = KMeans(init=init_centers_test, n_clusters=3, n_init=1)
-        km.fit(X_test)
-        p_suite.append(PY_equals(False, np.may_share_memory(km.cluster_centers_, init_centers)))
-    return p_suite
+    try:
+        X_small = np.array([[1.1, 1.1], [-7.5, -7.5], [-1.1, -1.1], [7.5, 7.5]])
+        init_centers = np.array([[0.0, 0.0], [5.0, 5.0], [-5.0, -5.0]])
+        p_suite = []
+        for dtype in [np.int32, np.int64, np.float32, np.float64]:
+            X_test = dtype(X_small)
+            init_centers_test = dtype(init_centers)
+            assert_array_equal(init_centers, init_centers_test)
+            km = KMeans(init=init_centers_test, n_clusters=3, n_init=1)
+            km.fit(X_test)
+            p_suite.append(PY_equals(False, np.may_share_memory(km.cluster_centers_, init_centers)))
+        return p_suite
+    except Exception:
+        return 4
 
 INIT_tests = [test_k_means_plus_plus_init,
               test_k_means_precompute_distances_flag,
@@ -1061,10 +1104,12 @@ INIT_tests = [test_k_means_plus_plus_init,
 
 def gather_tests_and_run_as_one():
     p_suite = PY_suite(suite_name=u'Kmeans_all')
+    failed = 0
     for fun in INIT_tests:
         test_list = fun()
-        if not test_list:print fun
-        else:
+        try:
+            failed += test_list
+        except TypeError:
             p_suite.addTests(fun())
     test_res = unittest.TextTestRunner(verbosity=0).run(p_suite)
     test_results = {'name':p_suite.name,'failures':test_res.failures,'errors':test_res.errors,'testsRun':test_res.testsRun}
