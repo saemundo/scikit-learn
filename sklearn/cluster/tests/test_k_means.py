@@ -31,7 +31,7 @@ from sklearn.exceptions import DataConversionWarning
 from sklearn.metrics.cluster import homogeneity_score
 
 import unittest
-from six import assertRaisesRegex
+# from six import assertRaisesRegex
 
 # non centered, sparse centers to check the
 centers = np.array([
@@ -324,9 +324,11 @@ def test_k_means_new_centers():
 def test_k_means_precompute_distances_flag():
     # check that a warning is raised if the precompute_distances flag is not
     # supported
-    km = KMeans(precompute_distances="wrong")
-    return [PY_raises(ValueError, km.fit, X)]
-
+    try:
+        km = KMeans(precompute_distances="wrong")
+        return [PY_raises(ValueError, km.fit, X)]
+    except Exception:
+        return 1
 
 def test_k_means_plus_plus_init_sparse():
     try:
@@ -909,7 +911,7 @@ def test_int_input():
             p_suite.append(PY_array_equals(scores, np.ones(scores.shape[0])))
         return p_suite
     except Exception:
-        return 13
+        return 14
 
 def test_transform():
     km = KMeans(n_clusters=n_clusters)
@@ -1112,6 +1114,14 @@ def gather_tests_and_run_as_one():
         except TypeError:
             p_suite.addTests(fun())
     test_res = unittest.TextTestRunner(verbosity=0).run(p_suite)
-    test_results = {'name':p_suite.name,'failures':test_res.failures,'errors':test_res.errors,'testsRun':test_res.testsRun}
+    if failed:
+        tots = failed+test_res.testsRun
+    else:
+        tots = test_res.testsRun
+    try:
+        failed+=test_res.failures
+    except TypeError:
+        failed+=len(test_res.failures)
+    test_results = {'name':p_suite.name,'failures':failed,'errors':test_res.errors,'testsRun':tots}
     print test_results
     
